@@ -1,0 +1,35 @@
+# open same folder path and run it in terminal.
+
+docker run --detach
+ --env MYSQL_ROOT_PASSWORD=123456   	    -- this is the password of root@localhost
+ --env MYSQL_USER=trading-platform-user	    -- this is a user using mysql container (same as application.properties)
+ --env MYSQL_PASSWORD=dummypassword 	    -- (same as application.properties) -- password of that user.
+ --env MYSQL_DATABASE=trading-platform-database
+ --name trading-platform-container 			-- the name of the container is this.
+ --publish 3307:3306				-- HostPort : DockerContainerPort
+  mysql:8-oracle		- this is the name of the complete image
+
+My laptop (host) port 3307 → forwards traffic to
+MySQL inside Docker container on port 3306( always 3306 ).
+
+Inside container → MySQL runs on 3306
+Outside (your app) → connects via localhost:3307
+
+final terminal command ( open same folder path in terminal before running )
+
+docker run -d \
+  --name trading-platform-container \
+  -e MYSQL_ROOT_PASSWORD=123456 \
+  -e MYSQL_USER=trading-platform-user \
+  -e MYSQL_PASSWORD=dummypassword \
+  -e MYSQL_DATABASE=trading-platform-database \
+  -p 3307:3306 \
+  mysql:8
+
+# image is created and this is the id : da906917ca4a
+
+# command to start this container : docker start trading-platform-container
+
+# command to check running containers : docker ps
+
+# command to stop a container : docker stop 58f( starting 2-3 chars from container id)

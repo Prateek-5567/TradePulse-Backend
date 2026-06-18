@@ -1,0 +1,12 @@
+Prateek has userid : 2 ; wallet id = 1 ; prateekbambal@gmail.com ; 123456
+atul has userid : 52 ; wallet id = 2   ; atul@gmail.com ; 123456
+
+
+How to turn terminal into mysql-sh :
+
+use docker ps : to check running containers , your container that you want to connect with must be running
+Enter Your MYSQL-SHELL : docker exec -it <Container-Name> mysql -u root -p
+Enter Password : 123456 ( the root password of your container is required to provide root access of your container to some service )
+
+
+final : docker exec -it trading-platform-container mysql -u root -p
