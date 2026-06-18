@@ -1,5 +1,12 @@
 package com.prateek.service;
 
+import com.prateek.config.AppUrls;
+import com.prateek.domain.PaymentMethod;
+import com.prateek.domain.PaymentOrderStatus;
+import com.prateek.model.PaymentOrder;
+import com.prateek.model.User;
+import com.prateek.repository.PaymentOrderRepository;
+import com.prateek.response.PaymentResponse;
 import com.razorpay.Payment;
 import com.razorpay.PaymentLink;
 import com.razorpay.RazorpayClient;
@@ -8,12 +15,6 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
-import com.prateek.domain.PaymentMethod;
-import com.prateek.domain.PaymentOrderStatus;
-import com.prateek.model.PaymentOrder;
-import com.prateek.model.User;
-import com.prateek.repository.PaymentOrderRepository;
-import com.prateek.response.PaymentResponse;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -121,7 +122,15 @@ public class PaymentServiceImpl implements PaymentService{
             paymentLinkRequest.put("reminder_enable",true);
 
             // Set the callback URL and method
-            paymentLinkRequest.put("callback_url","http://localhost:5173/wallet/?order_id="+orderId);
+//            paymentLinkRequest.put("callback_url","http://localhost:5173/wallet/?order_id="+orderId);
+
+            String callbackUrl =
+                    AppUrls.FRONTEND_BASE_URL
+                            + "/wallet?order_id="
+                            + orderId;
+
+            paymentLinkRequest.put("callback_url", callbackUrl);
+
 //          We just sent the order_id not the payment_id but to ProccedPaymentOrder() both are required
 //          Razorpay automatically appends razorpay_payment_id and razorpay_payment_link_id as query parameters to your callback URL.
 //          So the frontend actually receives: all three and uses whatever required.
@@ -150,11 +159,22 @@ public class PaymentServiceImpl implements PaymentService{
     public PaymentResponse createStripePaymentLink(User user, Long amount,Long orderId) throws StripeException {
         Stripe.apiKey = stripeSecretKey;
 
+        String successUrl =
+                AppUrls.FRONTEND_BASE_URL
+                        + "/wallet?order_id="
+                        + orderId;
+
+        String cancelUrl =
+                AppUrls.FRONTEND_BASE_URL
+                        + "/payment/cancel";
+
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:5173/wallet?order_id="+orderId) // frontend will be at 5173 localhost ( you need to update this url after hosting it )
-                .setCancelUrl("http://localhost:5173/payment/cancel")
+//                .setSuccessUrl("http://localhost:5173/wallet?order_id="+orderId) // frontend will be at 5173 localhost ( you need to update this url after hosting it )
+//                .setCancelUrl("http://localhost:5173/payment/cancel")
+                .setSuccessUrl(successUrl)
+                .setCancelUrl(cancelUrl)
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setQuantity(1L)
                         .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
